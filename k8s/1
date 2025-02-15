@@ -1,0 +1,21 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: egress-policy-bypass
+spec:
+  action: partition  # "allow" is invalid, use "partition" to block traffic
+  mode: all  # Apply to all matching pods
+  selector:
+    namespaces:
+      - ps  # Change if your pod is in a different namespace
+    labelSelectors:
+      app: my-app
+  direction: to
+  target:
+    mode: all  # Apply to all target pods
+    selector:
+      namespaces:
+        - ps  # Update if your proxy is in a different namespace
+      labelSelectors:
+        app: proxy-nginx  # Target the proxy service
+

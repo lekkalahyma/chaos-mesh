@@ -1,0 +1,22 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: bypass-egress-policy
+  namespace: ps  # Change to your target namespace
+spec:
+  action: partition  # Simulate a network partition
+  mode: all          # Apply to all matching pods
+  selector:
+    namespaces:
+      - ps          # Change if your pod is in a different namespace
+    labelSelectors:
+      app: my-app   # Update with your target pod's label
+  direction: both    # Specify that the partition affects both incoming and outgoing traffic
+  target:
+    mode: all        # Target all pods matching the selector
+    selector:
+      namespaces:
+        - default    # Change to the namespace where the affected pods reside
+      labelSelectors:
+        app: proxy-nginx  # Update with the label of the proxy service or target pods
+

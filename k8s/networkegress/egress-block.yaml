@@ -1,0 +1,20 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: egress-block
+    # namespace: ps  # Specify your namespace here
+spec:
+  action: partition  # Use 'partition' to block egress traffic
+  mode: one  # Apply to one pod only
+  selector:
+    namespaces:
+      -  bank-of-anthos 
+    labelSelectors:
+      app:  balancereader  # Replace with your pod's label
+  duration: "3m"  # Duration of the chaos experiment
+    # delay:  # Define delay as a structured object
+    # latency: "0ms"  # No latency added
+      # correlation: "100"
+      # jitter: "0ms"
+  direction: from  # Block outgoing traffic only
+

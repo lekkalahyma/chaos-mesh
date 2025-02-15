@@ -1,0 +1,30 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: Workflow
+metadata:
+  name: egress-experiments
+  namespace: bank-of-anthos  # Specify your namespace here
+spec:
+  entry: entry
+  templates:
+    - name: entry
+      templateType: Parallel  # Specifies that the following tasks will run in parallel
+      children:
+        - name: egress-block  # This is the name of the child workflow
+          template: egress-block-template  # Reference to the egress block template
+        - name: egress-allow  # This is the name of the child workflow
+          template: egress-allow-template   # Reference to the egress allow template
+
+    - name: egress-block-template
+      templateType: NetworkChaos
+      networkChaos:
+        action: partition
+        mode: one
+        selector:
+          namespaces:
+            - bank-of-anthos
+          labelSelectors:
+            app: balancereader
+        duration: "3m"
+        delay:
+          late
+
