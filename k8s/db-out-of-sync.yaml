@@ -1,0 +1,17 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: network-partition-chaos
+  namespace: bank-of-anthos  # Your namespace
+spec:
+  action: partition
+  mode: all  # Applies to all matching pods
+  selector:
+    namespaces:
+      - boa  # Your namespace
+    labelSelectors:
+      app: ledger-db
+  direction: to  # Traffic to target pods is affected
+  externalTargets: []  # Use external targets if necessary, or remove this
+  duration: "300s"  # Simulate network partition for 300 seconds
+
