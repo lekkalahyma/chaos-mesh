@@ -1,0 +1,19 @@
+kind: Schedule
+apiVersion: chaos-mesh.org/v1alpha1
+metadata:
+  namespace: boa
+  name: kill-sidecar-schedule
+spec:
+  schedule: '@every 30s'
+  type: PodChaos
+  podChaos:
+    selector:
+      namespaces:
+        - boa
+      labelSelectors:
+        app: balancereader
+    mode: one
+    containerNames:
+      - logging-sidecar
+    action: container-kill
+

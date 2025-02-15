@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: balance-reader
+  namespace: ps  # This should be the ps namespace
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: balance-reader
+  template:
+    metadata:
+      labels:
+        app: balance-reader
+    spec:
+      containers:
+        - name: balance-reader
+          image: nginx:latest
+          ports:
+            - containerPort: 8080
+
+        # Sidecar container
+        - name: logging-sidecar
+          image: busybox
+          command: ["/bin/sh", "-c", "while true; do echo 'Logging sidecar running...'; sleep 5; done"]
+

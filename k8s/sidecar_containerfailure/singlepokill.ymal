@@ -1,0 +1,17 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: PodChaos
+metadata:
+  name: kill-sidecar
+  namespace: ps  # Ensure it's in the correct namespace
+spec:
+  action: container-kill
+  mode: one
+  selector:
+    namespaces:
+      - ps
+    labelSelectors:
+      app: balance-reader  # Ensure it matches the deployment labels
+  containerNames:
+    - logging-sidecar  # The name of the sidecar container to kill
+#  duration: "2m"  # Set to 2 minutes
+

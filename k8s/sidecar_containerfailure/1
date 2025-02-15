@@ -1,0 +1,18 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: PodChaos
+metadata:
+  name: container-kill-example
+  namespace: chaos-mesh  # Namespace where Chaos Mesh experiments are running
+spec:
+  action: container-kill
+  mode: one  # Kill one container at a time
+  containerNames:
+    - logging-sidecar  # Name of the container to be killed
+  selector:
+    matchLabels:
+      app: balance-reader  # Match the label on the pods you want to target
+  # If pods are in a different namespace, you need to specify the namespace explicitly
+  namespaceSelector:
+    matchNames:
+      - ps  # Pods are in the 'ps' namespace
+
