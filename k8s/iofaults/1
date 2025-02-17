@@ -1,0 +1,17 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: IOChaos
+metadata:
+  name: io-fault-example
+  namespace: ps
+spec:
+  action: fault
+  mode: one
+  selector:
+    labelSelectors:
+      app: postgres
+  volumePath: /var/lib/postgresql/data
+  path: /var/lib/postgresql/data/**/*  # Targeting all files under the data directory
+  errno: 5  # Input/Output error
+  percent: 50  # Injecting fault on 50% of the IO operations
+  duration: '400s'  # Duration for the fault injection
+
