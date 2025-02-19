@@ -1,0 +1,14 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: IOChaos
+metadata:
+  name: slow-disk-io
+  namespace: ps  # Ensure this is the correct namespace
+spec:
+  action: latency
+  mode: one  # Apply to a single pod (use "all" for multiple pods)
+  selector:
+    labelSelectors:
+      chaos: target  # Ensure this matches the pod label applied above
+  volumePath: "/var/lib/postgresql/data"  # Ensure this path is correct
+  duration: "30s"  # Duration for the chaos experiment
+

@@ -1,0 +1,14 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: network-chaos
+  namespace: ps
+spec:
+  action: partition
+  mode: all
+  selector:
+    namespaces:
+      - ps
+    labelSelectors:
+      app: postgres
+

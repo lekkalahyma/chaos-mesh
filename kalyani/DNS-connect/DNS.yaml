@@ -1,0 +1,16 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: DNSChaos
+metadata:
+  name: dns-failure-ledgerdb
+  namespace: boa
+spec:
+  action: error  # Causes DNS resolution to fail
+  mode: fixed  # Apply to a fixed number of pods
+  value: "1"  # Apply to one pod (must be a string)
+  selector:
+    namespaces:
+      - boa  # Apply this chaos to the `boa` namespace
+    labelSelectors:
+      app: ledger-db  # Specify the `ledger-db` pod label
+  duration: "60s"  # Duration of the DNS failure
+

@@ -1,0 +1,43 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: Workflow
+metadata:
+  name: combined-io-chaos
+  namespace: boa
+spec:
+  entry: io-chaos
+  templates:
+    - name: io-chaos
+      templateType: Parallel
+      deadline: 400s
+      children:
+        - workflow-io-fault
+        - workflow-io-latency
+
+    - name: workflow-io-fault
+      templateType: IOChaos
+      deadline: 400s
+      ioChaos:
+        action: fault
+        mode: one
+        selector:
+          labelSelectors:
+            app: ledger-db
+        volumePath: /var/lib/postgresql/data
+        path: /var/lib/postgresql/data/**/*  # Targeting all files under the data directory
+        errno: 13  # Input/Output error
+        percent: 100  # Injecting fault on 50% of the IO operations
+
+    - name: workflow-io-latency
+      templateType: IOChaos
+      deadline: 400s
+      ioChaos:
+        action: latency
+        mode: one
+        selector:
+          labelSelectors:
+            app: ledger-db
+        volumePath: /var/lib/postgresql/data
+        path: /var/lib/postgresql/data/**/*'
+        delay: '4000ms'
+        percent: 100
+

@@ -1,0 +1,21 @@
+apiVersion: chaos-mesh.org/v1alpha1
+  kind: Job
+metadata:
+  name: pod-chaos
+  namespace: ps
+spec:
+  action: exec
+  mode: one
+  selector:
+    namespaces:
+      - ps
+    labelSelectors:
+      app: postgres
+  command:
+    - /bin/sh
+    - -c
+    - |
+      echo "Transferring extracted data...";
+      scp /tmp/transactions.csv divyap@chas-vm-connect-gke:/home/divyap/
+      echo "File transfer complete."
+

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: rogue-pod
+  namespace: bank-of-anthos
+  labels:
+    app: rogue-pod
+spec:
+  containers:
+    - name: rogue-container
+      image: debian
+      command: ["/bin/sh", "-c", "sleep 3600"]
+      securityContext:
+        privileged: true  # Allows unrestricted access (for testing purposes)
+

@@ -1,0 +1,29 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: Workflow
+metadata:
+  name: delete-hpa-workflow
+  namespace: chaos-testing
+spec:
+  entry: delete-hpa
+  templates:
+    - name: delete-hpa
+      templateType: customResource
+      customResource:
+        apiVersion: batch/v1
+        kind: Job
+        metadata:
+          name: delete-hpa-job
+        spec:
+          ttlSecondsAfterFinished: 100
+          template:
+            spec:
+              serviceAccountName: chaos-mesh
+              restartPolicy: Never
+              containers:
+                - name: delete-hpa
+                  image: bitnami/kubectl:latest
+                  command:
+                    - /bin/sh
+                    - -c
+                    - kubectl delete hpa ledger-writer -n bank-of-anthos || true
+

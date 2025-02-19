@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: extract-data
+  namespace: ps
+spec:
+  template:
+    spec:
+      containers:
+      - name: extract-data
+        image: postgres:latest  # Uses official PostgreSQL image
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            echo "Extracting sensitive data...";
+            PGPASSWORD='root' psql -U postgres -d postgres -c "COPY transactions TO '/tmp/transactions.csv' CSV HEADER;";
+            echo "Data saved to /tmp/transactions.csv";
+      restartPolicy: Never
+  backoffLimit: 2  # Retry the job twice if it fails
+

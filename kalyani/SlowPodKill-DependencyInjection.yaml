@@ -1,0 +1,184 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: Workflow
+metadata:
+  name: latency-and-pod-partition-test
+  namespace: bank-of-anthos
+spec:
+  entry: "combined-tests"
+  templates:
+    - name: combined-tests
+      templateType: Parallel
+      children:
+        - latency-and-pod-kill
+        - network-partition-frontend-ledgerwriter
+
+    - name: latency-and-pod-kill
+      templateType: Serial
+      children:
+        - network-latency-steps
+        - pod-kill-frontend
+
+    - name: network-latency-steps
+      templateType: Serial
+      children:
+        - network-latency-10
+        - network-latency-20
+        - network-latency-30
+        - network-latency-40
+        - network-latency-50
+        - network-latency-60
+        - network-latency-70
+        - network-latency-80
+
+    - name: network-latency-10
+      templateType: NetworkChaos
+      networkChaos:
+        action: delay
+        mode: all
+        selector:
+          namespaces:
+            - bank-of-anthos
+          labelSelectors:
+            app: frontend
+        delay:
+          latency: "2000ms"
+          correlation: "10"
+      deadline: 60s
+
+    - name: network-latency-20
+      templateType: NetworkChaos
+      networkChaos:
+        action: delay
+        mode: all
+        selector:
+          namespaces:
+            - bank-of-anthos
+          labelSelectors:
+            app: frontend
+        delay:
+          latency: "2000ms"
+          correlation: "20"
+      deadline: 60s
+
+    - name: network-latency-30
+      templateType: NetworkChaos
+      networkChaos:
+        action: delay
+        mode: all
+        selector:
+          namespaces:
+            - bank-of-anthos
+          labelSelectors:
+            app: frontend
+        delay:
+          latency: "2000ms"
+          correlation: "30"
+      deadline: 60s
+
+    - name: network-latency-40
+      templateType: NetworkChaos
+      networkChaos:
+        action: delay
+        mode: all
+        selector:
+          namespaces:
+            - bank-of-anthos
+          labelSelectors:
+            app: frontend
+        delay:
+          latency: "2000ms"
+          correlation: "40"
+      deadline: 60s
+
+    - name: network-latency-50
+      templateType: NetworkChaos
+      networkChaos:
+        action: delay
+        mode: all
+        selector:
+          namespaces:
+            - bank-of-anthos
+          labelSelectors:
+            app: frontend
+        delay:
+          latency: "2000ms"
+          correlation: "50"
+      deadline: 60s
+
+    - name: network-latency-60
+      templateType: NetworkChaos
+      networkChaos:
+        action: delay
+        mode: all
+        selector:
+          namespaces:
+            - bank-of-anthos
+          labelSelectors:
+            app: frontend
+        delay:
+          latency: "2000ms"
+          correlation: "60"
+      deadline: 60s
+
+    - name: network-latency-70
+      templateType: NetworkChaos
+      networkChaos:
+        action: delay
+        mode: all
+        selector:
+          namespaces:
+            - bank-of-anthos
+          labelSelectors:
+            app: frontend
+        delay:
+          latency: "2000ms"
+          correlation: "70"
+      deadline: 60s
+
+    - name: network-latency-80
+      templateType: NetworkChaos
+      networkChaos:
+        action: delay
+        mode: all
+        selector:
+          namespaces:
+            - bank-of-anthos
+          labelSelectors:
+            app: frontend
+        delay:
+          latency: "2000ms"
+          correlation: "80"
+      deadline: 60s
+
+    - name: pod-kill-frontend
+      templateType: PodChaos
+      podChaos:
+        action: pod-kill
+        mode: one
+        selector:
+          namespaces:
+            - bank-of-anthos
+          labelSelectors:
+            app: frontend
+      deadline: 60s
+
+    - name: network-partition-frontend-ledgerwriter
+      templateType: NetworkChaos
+      networkChaos:
+        action: partition
+        mode: all
+        selector:
+          namespaces:
+            - bank-of-anthos
+          labelSelectors:
+            app: frontend
+        direction: both
+        target:
+          mode: all
+          selector:
+            namespaces:
+              - bank-of-anthos
+            labelSelectors:
+              app: ledgerwriter
+                # deadline: 60s
+
